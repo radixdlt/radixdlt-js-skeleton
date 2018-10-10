@@ -137,10 +137,8 @@ export default {
       })
       // Get transactions
       account.transferSystem.getAllTransactions().subscribe((transactionUpdate) => {
-        // Get hid of the transaction update
-        const hid = transactionUpdate.hid
-        // Get complete transaction from the account by hid
-        const transaction = account.transferSystem.transactions.get(hid)
+        // Get complete transaction from the transaction update
+        const transaction = transactionUpdate.transaction
         // Convert subUnits to token units
         transaction.balance[testToken.id.toString()] = testToken.toTokenUnits(transaction.balance[testToken.id.toString()])
         // Add transaction to transactions list
@@ -148,19 +146,14 @@ export default {
       })
       // Get messages
       account.messagingSystem.getAllMessages().subscribe((messageUpdate) => {
-        // Get hid of the message update
-        const hid = messageUpdate.hid
-        // Get complete message from the account by hid
-        const message = account.messagingSystem.messages.get(hid)
+        // Get complete message from the message update
+        const message = messageUpdate.message
         // Add message to messages list
         this.messages.push(message)
       })
 
       account.openNodeConnection()
     })
-
-
-
   }
 }
 </script>
