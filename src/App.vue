@@ -141,7 +141,7 @@ export default {
         const hid = transactionUpdate.hid
         // Get complete transaction from the account by hid
         const transaction = account.transferSystem.transactions.get(hid)
-        // Convert subUnits to token unitsy
+        // Convert subUnits to token units
         transaction.balance[testToken.id.toString()] = testToken.toTokenUnits(transaction.balance[testToken.id.toString()])
         // Add transaction to transactions list
         this.transactions.push(transaction)
