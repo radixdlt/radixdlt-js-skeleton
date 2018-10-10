@@ -13,5 +13,3 @@ npm run dev
 ```
 
 # Check the live version [here](https://radixdlt.github.io/radixdlt-js-skeleton)!
-
-> Only Chrome.
