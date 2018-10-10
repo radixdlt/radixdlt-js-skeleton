@@ -4,36 +4,39 @@
     div.site-wrapper-inner
       h1 radixdlt-js
       h4 skeleton example
+      a(href="#", @click="resetIdentity()") Generate new identity
 
-      //- User's Address & Balance
-      div.row
-        div.col-md-12.col-lg-9.column
-          Address(:address="address")
-        div.col-md-12.col-lg-3.column
-          Balance(:balance="balance")
+      div(v-if="!identity") Decrypting key
+      div(v-if="identity")
+        //- User's Address & Balance
+        div.row
+          div.col-md-12.col-lg-9.column
+            Address(:address="address")
+          div.col-md-12.col-lg-3.column
+            Balance(:balance="balance")
 
-      //- Tabs
-      vue-tabs
-        //- 1st Tab: Transactions
-        v-tab(title="Transactions")
-          div.row
-            div.col-md-12.column
-              SendTransaction(:identity="identity")
-              ListTransactions(:transactions="transactions")
+        //- Tabs
+        vue-tabs
+          //- 1st Tab: Transactions
+          v-tab(title="Transfers")
+            div.row
+              div.col-md-12.column
+                SendTransaction(:identity="identity")
+                ListTransactions(:transactions="transactions")
 
-        //- 2nd Tab: Messages
-        v-tab(title="Messages")
-          div.row
-            div.col-md-12.column
-              SendMessage(:identity="identity")
-              ListMessages(:messages="messages")
+          //- 2nd Tab: Messages
+          v-tab(title="Messages")
+            div.row
+              div.col-md-12.column
+                SendMessage(:identity="identity")
+                ListMessages(:messages="messages")
 
-        //- 3rd Tab: Application Messages
-        v-tab(title="Application Messages")
-          div.row
-            div.col-md-12.column
-              SendApplicationMessage(:identity="identity")
-              ListApplicationMessages(:identity="identity")
+          //- 3rd Tab: Application Messages
+          v-tab(title="Application Data")
+            div.row
+              div.col-md-12.column
+                SendApplicationMessage(:identity="identity")
+                ListApplicationMessages(:identity="identity")
 </template>
 
 <script>
@@ -56,7 +59,8 @@ import {
   RadixUniverse,
   RadixIdentityManager,
   RadixSimpleIdentity,
-  RadixKeyPair
+  RadixKeyPair,
+  RadixKeyStore,
 } from 'radixdlt'
 
 export default {
@@ -82,57 +86,81 @@ export default {
       identity: null
     }
   },
-  created() {
+  methods: {
+    loadIdentity() {
+      return new Promise((resolve, reject) => {
+        // NOTE: This is insecure, normally you would ask the user for a password
+        const password = "SuperDuperSecure"
+
+        if (!this.$localStorage.get('keystore')) {
+          // Generate a new radom identity
+          const keyPair = RadixKeyPair.generateNew()
+          RadixKeyStore.encryptKey(keyPair, password).then((encryptedKey) => {
+            this.$localStorage.set('keystore', JSON.stringify(encryptedKey))
+            console.log('Encrypted private key stored in localstorage')
+          })
+          resolve(new RadixSimpleIdentity(keyPair))
+        }
+        else {
+          // Load identity from localstorage
+          const encryptedKey = JSON.parse(this.$localStorage.get('keystore'))
+          RadixKeyStore.decryptKey(encryptedKey, password).then(keyPair => {
+            return resolve(new RadixSimpleIdentity(keyPair))
+          })
+        }
+
+      })
+
+    },
+    resetIdentity() {
+      this.$localStorage.remove('keystore')
+      location.reload()
+    }
+  },
+  created () {
     // Bootstrap the universe
     radixUniverse.bootstrap(RadixUniverse.ALPHANET)
-    // Initialize the token manager
-    radixTokenManager.initialize()
 
-    // NOTE: this is unsecure and only for testing purposes
-    // Check if the private key is in the localStorate
-    if (!this.$localStorage.get('private')) {
-      // Otherwise generate a new one
-      this.$localStorage.set('private', RadixKeyPair.generateNew().getPrivate())
-    }
-    
-    const keyPair = RadixKeyPair.fromPrivate(this.$localStorage.get('private'))
+    this.loadIdentity().then(identity => {
+      this.identity = identity
 
-    // Create identity from keyPair
-    this.identity = new RadixSimpleIdentity(keyPair)
+      const account = this.identity.account
 
-    const account = this.identity.account
+      // Load default token
+      const testToken = radixTokenManager.getTokenByISO('TEST')
 
-    // Load default token
-    const testToken = radixTokenManager.getTokenByISO('TEST')
+      // Get address
+      this.address = account.getAddress()
+      // Get balance
+      account.transferSystem.balanceSubject.subscribe(balance => {
+        this.balance = testToken.toTokenUnits(balance[testToken.id.toString()])
+      })
+      // Get transactions
+      account.transferSystem.getAllTransactions().subscribe((transactionUpdate) => {
+        // Get hid of the transaction update
+        const hid = transactionUpdate.hid
+        // Get complete transaction from the account by hid
+        const transaction = account.transferSystem.transactions.get(hid)
+        // Convert subUnits to token unitsy
+        transaction.balance[testToken.id.toString()] = testToken.toTokenUnits(transaction.balance[testToken.id.toString()])
+        // Add transaction to transactions list
+        this.transactions.push(transaction)
+      })
+      // Get messages
+      account.messagingSystem.getAllMessages().subscribe((messageUpdate) => {
+        // Get hid of the message update
+        const hid = messageUpdate.hid
+        // Get complete message from the account by hid
+        const message = account.messagingSystem.messages.get(hid)
+        // Add message to messages list
+        this.messages.push(message)
+      })
 
-    // Get address
-    this.address = keyPair.getAddress()
-    // Get balance
-    account.transferSystem.balanceSubject.subscribe(balance => {
-      this.balance = testToken.toTokenUnits(balance[testToken.id.toString()])
-    })
-    // Get transactions
-    account.transferSystem.getAllTransactions().subscribe((transactionUpdate) => {
-      // Get hid of the transaction update
-      const hid = transactionUpdate.hid
-      // Get complete transaction from the account by hid
-      const transaction = account.transferSystem.transactions.get(hid)
-      // Convert subUnits to token unitsy
-      transaction.balance[testToken.id.toString()] = testToken.toTokenUnits(transaction.balance[testToken.id.toString()])
-      // Add transaction to transactions list
-      this.transactions.push(transaction)
-    })
-    // Get messages
-    account.messagingSystem.getAllMessages().subscribe((messageUpdate) => {
-      // Get hid of the message update
-      const hid = messageUpdate.hid
-      // Get complete message from the account by hid
-      const message = account.messagingSystem.messages.get(hid)
-      // Add message to messages list
-      this.messages.push(message)
+      account.openNodeConnection()
     })
 
-    account.openNodeConnection()
+
+
   }
 }
 </script>

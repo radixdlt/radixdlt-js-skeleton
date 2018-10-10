@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    h3 Send Application Message
+    h3 Store Application Data
     input.form-control(type="text", placeholder="Application ID..", v-model="applicationId")
     input.form-control(type="text", placeholder="Destination addresses (separated by comma)..", v-model="destinations")
     textarea.form-control(rows="5", placeholder="Message..", v-model="message")

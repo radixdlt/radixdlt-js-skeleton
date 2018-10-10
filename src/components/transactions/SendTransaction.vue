@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    h3 Send Transaction
+    h3 Transfer Tokens
     input.form-control(type="text", placeholder="Destination address..", v-model="destination")
     input.form-control(type="text", placeholder="Asset ISO..", v-model="asset", disabled)
     input.form-control(type="number", placeholder="Min: 0.00001", min="0.00001", step="0.00001", v-model="quantity")

@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    h3 Application Messages
+    h3 View Application Data
     div.input-group.mb-3
       input.form-control(type="text", placeholder="Application ID..", v-model="applicationId", @keydown.enter="getApplicationMessages()")
       button.btn.btn-outline-secondary(type="button", style="margin-left: 5px", @click="getApplicationMessages()") GET
@@ -21,9 +21,12 @@ export default {
   props: ['identity'],
   data () {
     return {
-      applicationId: '',
+      applicationId: 'radix-messaging',
       messages: []
     }
+  },
+  created () {
+    this.getApplicationMessages()
   },
   methods: {
     getApplicationMessages () {

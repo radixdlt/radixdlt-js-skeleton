@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    h3 Transactions
+    h3 Transfers
     table.table.table-sm(striped="true")
       thead
         tr
