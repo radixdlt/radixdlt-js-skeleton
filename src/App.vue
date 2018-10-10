@@ -84,7 +84,7 @@ export default {
   },
   created() {
     // Bootstrap the universe
-    radixUniverse.bootstrap(RadixUniverse.HIGHGARDEN)
+    radixUniverse.bootstrap(RadixUniverse.ALPHANET)
     // Initialize the token manager
     radixTokenManager.initialize()
 
