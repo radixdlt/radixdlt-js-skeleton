@@ -106,9 +106,7 @@ export default {
             return resolve(new RadixSimpleIdentity(keyPair))
           })
         }
-
       })
-
     },
     resetIdentity() {
       this.$localStorage.remove('keystore')
