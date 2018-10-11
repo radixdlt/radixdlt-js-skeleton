@@ -7,12 +7,14 @@
     table.table.table-sm
       thead
         tr
-          th(scope="col") Application ID
+          th(scope="col") HID
           th(scope="col") Payload
+          th(scope="col") Timestamp
       tbody
         tr(v-for="m in messages")
-          td {{ m.applicationId }}
-          td {{ m.data.payload }}
+          td {{ m.hid }}
+          td {{ m.payload }}
+          td {{ new Date(m.timestamp).toUTCString() }}
 </template>
 
 <script>
@@ -33,8 +35,7 @@ export default {
       this.messages = []
       // Get application message updates
       this.identity.account.dataSystem.getApplicationData(this.applicationId).subscribe(applicationDataUpdate => {
-        // Add application message update to messages list
-        this.messages.push(applicationDataUpdate)
+        this.messages = this.identity.account.dataSystem.applicationData.get(this.applicationId).values()
       })
     }
   }

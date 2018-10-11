@@ -22,14 +22,14 @@
             div.row
               div.col-md-12.column
                 SendTransaction(:identity="identity")
-                ListTransactions(:transactions="transactions")
+                ListTransactions(:identity="identity")
 
           //- 2nd Tab: Messages
           v-tab(title="Messages")
             div.row
               div.col-md-12.column
                 SendMessage(:identity="identity")
-                ListMessages(:messages="messages")
+                ListMessages(:identity="identity")
 
           //- 3rd Tab: Application Messages
           v-tab(title="Application Data")
@@ -80,8 +80,6 @@ export default {
     return {
       address: 'address',
       balance: 'balance',
-      transactions: [],
-      messages: [],
       token: null,
       identity: null
     }
@@ -134,22 +132,6 @@ export default {
       // Get balance
       account.transferSystem.balanceSubject.subscribe(balance => {
         this.balance = testToken.toTokenUnits(balance[testToken.id.toString()])
-      })
-      // Get transactions
-      account.transferSystem.getAllTransactions().subscribe((transactionUpdate) => {
-        // Get complete transaction from the transaction update
-        const transaction = transactionUpdate.transaction
-        // Convert subUnits to token units
-        transaction.balance[testToken.id.toString()] = testToken.toTokenUnits(transaction.balance[testToken.id.toString()])
-        // Add transaction to transactions list
-        this.transactions.push(transaction)
-      })
-      // Get messages
-      account.messagingSystem.getAllMessages().subscribe((messageUpdate) => {
-        // Get complete message from the message update
-        const message = messageUpdate.message
-        // Add message to messages list
-        this.messages.push(message)
       })
 
       account.openNodeConnection()
