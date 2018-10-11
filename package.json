@@ -11,7 +11,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "radixdlt": "^0.10.2",
+    "radixdlt": "^0.11.1",
     "vue": "^2.5.2",
     "vue-awesome": "^3.0.5",
     "vue-localstorage": "^0.6.2",
@@ -56,7 +56,7 @@
     "pug-loader": "^2.4.0",
     "rimraf": "^2.6.0",
     "sass-loader": "^7.0.3",
-    "semver": "^5.3.0",
+    "semver": "^5.6.0",
     "shelljs": "^0.7.6",
     "style-loader": "^0.21.0",
     "uglifyjs-webpack-plugin": "^1.1.1",

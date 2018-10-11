@@ -23,10 +23,6 @@ export default {
     sendMessage () {
       const fromAccount = this.identity.account
 
-      fromAccount.openNodeConnection()
-
-      // Wait for the account to sync data from the ledger
-
       // No need to load data from the ledger for the recipient account
       const toAccount = RadixAccount.fromAddress(this.destination, true)
 
