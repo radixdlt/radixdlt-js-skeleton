@@ -13,3 +13,13 @@ npm run dev
 ```
 
 # Check the live version [here](https://radixdlt.github.io/radixdlt-js-skeleton)!
+
+## How to update the live version?
+
+1. Run `npm run build` to generate the production files under the `dist` folder.
+
+2. Re-name it to `docs`.
+
+3. Update the repo.
+
+> It may take a few minutes to update.
