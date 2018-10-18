@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { RadixAccount, RadixTransactionBuilder } from 'radixdlt'
+import { RadixAccount, RadixTransactionBuilder, radixTokenManager } from 'radixdlt'
 
 export default {
   name: 'SendTransaction',
@@ -30,8 +30,10 @@ export default {
       // No need to load data from the ledger for the recipient account
       const toAccount = RadixAccount.fromAddress(this.destination, true)
 
+      const tokenClass = radixTokenManager.getTokenByISO(this.asset)
+
       const transactionStatus = RadixTransactionBuilder
-        .createTransferAtom(fromAccount, toAccount, this.asset, this.quantity, this.message)
+        .createTransferAtom(fromAccount, toAccount, tokenClass, this.quantity, this.message)
         .signAndSubmit(this.identity)
 
       transactionStatus.subscribe({
