@@ -115,7 +115,7 @@ export default {
   },
   created () {
     // Bootstrap the universe
-    radixUniverse.bootstrap(RadixUniverse.ALPHANET)
+    radixUniverse.bootstrap(RadixUniverse.HIGHGARDEN)
 
     this.loadIdentity().then(identity => {
       this.identity = identity
