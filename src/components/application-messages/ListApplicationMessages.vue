@@ -4,6 +4,7 @@
     div.input-group.mb-3
       input.form-control(type="text", placeholder="Application ID..", v-model="applicationId", @keydown.enter="getApplicationMessages()")
       button.btn.btn-outline-secondary(type="button", style="margin-left: 5px", @click="getApplicationMessages()") GET
+    input.form-control(type="text", placeholder="Signer addresses (separated by comma)..", v-model="signers")
     table.table.table-sm
       thead
         tr
@@ -18,13 +19,16 @@
 </template>
 
 <script>
+import { RadixAccount } from '../../../../radixdlt-js'
+
 export default {
   name: 'ListApplicationMessages',
   props: ['identity'],
   data () {
     return {
-      applicationId: 'radix-messaging',
-      messages: []
+      applicationId: 'sprint-sample',
+      messages: [],
+      signers: '',
     }
   },
   created () {
@@ -33,9 +37,16 @@ export default {
   methods: {
     getApplicationMessages () {
       this.messages = []
+      // Extract signer addresses from input
+      const signers = []
+      if (this.signers !== '') {
+        for (let signer of this.signers.split(',')) {
+          signers.push(RadixAccount.fromAddress(signer.trim()).getAddress())
+        }
+      }
       // Get application message updates
-      this.identity.account.dataSystem.getApplicationData(this.applicationId).subscribe(applicationDataUpdate => {
-        this.messages = this.identity.account.dataSystem.applicationData.get(this.applicationId).values()
+      this.identity.account.dataSystem.getApplicationData(this.applicationId, signers).subscribe(applicationDataUpdate => {
+        this.messages.push(applicationDataUpdate.data)
       })
     }
   }

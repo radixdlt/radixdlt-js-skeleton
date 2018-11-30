@@ -61,7 +61,7 @@ import {
   RadixSimpleIdentity,
   RadixKeyPair,
   RadixKeyStore,
-} from 'radixdlt'
+} from '../../radixdlt-js'
 
 export default {
   name: 'App',
@@ -115,7 +115,7 @@ export default {
   },
   created () {
     // Bootstrap the universe
-    radixUniverse.bootstrap(RadixUniverse.HIGHGARDEN)
+    radixUniverse.bootstrap(RadixUniverse.ALPHANET)
 
     this.loadIdentity().then(identity => {
       this.identity = identity

@@ -21,7 +21,7 @@
 
 import {
   radixTokenManager,
-} from 'radixdlt'
+} from '../../../../radixdlt-js'
 
 export default {
   name: 'ListTransactions',

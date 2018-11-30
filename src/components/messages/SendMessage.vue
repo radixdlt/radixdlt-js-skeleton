@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { RadixAccount, RadixTransactionBuilder } from 'radixdlt'
+import { RadixAccount, RadixTransactionBuilder } from '../../../../radixdlt-js'
 
 export default {
   name: 'SendMessage',
