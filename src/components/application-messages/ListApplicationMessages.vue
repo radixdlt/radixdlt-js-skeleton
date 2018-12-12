@@ -14,7 +14,7 @@
       tbody
         tr(v-for="m in messages")
           td {{ m.hid }}
-          td {{ m.payload }}
+          td {{ m.payload.data }}
           td {{ new Date(m.timestamp).toUTCString() }}
 </template>
 
@@ -26,7 +26,7 @@ export default {
   props: ['identity'],
   data () {
     return {
-      applicationId: 'sprint-sample',
+      applicationId: 'message',
       messages: [],
       signers: '',
     }

@@ -30,10 +30,10 @@ export default {
       // No need to load data from the ledger for the recipient account
       const toAccount = RadixAccount.fromAddress(this.destination, true)
 
-      const tokenClass = radixTokenManager.getTokenByISO(this.asset)
+      const tokenId = radixTokenManager.nativeToken.toString()
 
       const transactionStatus = RadixTransactionBuilder
-        .createTransferAtom(fromAccount, toAccount, tokenClass, this.quantity, this.message)
+        .createTransferAtom(fromAccount, toAccount, tokenId, this.quantity, this.message)
         .signAndSubmit(this.identity)
 
       transactionStatus.subscribe({

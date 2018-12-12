@@ -12,7 +12,10 @@
 </template>
 
 <script>
-import { RadixAccount, RadixTransactionBuilder } from '../../../../radixdlt-js'
+import {
+  RadixAccount,
+  RadixTransactionBuilder
+} from '../../../../radixdlt-js'
 
 export default {
   name: 'SendApplicationMessage',
@@ -39,7 +42,7 @@ export default {
       }
 
       const transactionStatus = RadixTransactionBuilder
-        .createPayloadAtom(destinations, this.applicationId, this.message, this.encrypted)
+        .createPayloadAtom(fromAccount, this.applicationId, this.message, destinations, this.encrypted)
         .signAndSubmit(this.identity)
 
       transactionStatus.subscribe({

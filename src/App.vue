@@ -59,8 +59,11 @@ import {
   RadixUniverse,
   RadixIdentityManager,
   RadixSimpleIdentity,
-  RadixKeyPair,
+  RadixRemoteIdentity,
+  RadixAddress,
   RadixKeyStore,
+  RadixLogger,
+RadixIdentity,
 } from '../../radixdlt-js'
 
 export default {
@@ -81,30 +84,30 @@ export default {
       address: 'address',
       balance: 'balance',
       token: null,
-      identity: null
+      identity: null,
     }
   },
   methods: {
     loadIdentity() {
-      return new Promise((resolve, reject) => {
+      return new Promise(async (resolve, reject) => {
         // NOTE: This is insecure, normally you would ask the user for a password
-        const password = "SuperDuperSecure"
+        const password = 'SuperDuperSecure'
 
         if (!this.$localStorage.get('keystore')) {
           // Generate a new radom identity
-          const keyPair = RadixKeyPair.generateNew()
+          const keyPair = RadixAddress.generateNew()
           RadixKeyStore.encryptKey(keyPair, password).then((encryptedKey) => {
             this.$localStorage.set('keystore', JSON.stringify(encryptedKey))
             console.log('Encrypted private key stored in localstorage')
           })
           resolve(new RadixSimpleIdentity(keyPair))
-        }
-        else {
+        } else {
           // Load identity from localstorage
           const encryptedKey = JSON.parse(this.$localStorage.get('keystore'))
           RadixKeyStore.decryptKey(encryptedKey, password).then(keyPair => {
-            return resolve(new RadixSimpleIdentity(keyPair))
+            resolve(new RadixSimpleIdentity(keyPair))
           })
+          // resolve(await RadixRemoteIdentity.createNew('my dApp', 'my dApp description'))
         }
       })
     },
@@ -114,8 +117,10 @@ export default {
     }
   },
   created () {
+    RadixLogger.setLevel('debug')
+
     // Bootstrap the universe
-    radixUniverse.bootstrap(RadixUniverse.ALPHANET)
+    radixUniverse.bootstrap(RadixUniverse.LOCAL)
 
     this.loadIdentity().then(identity => {
       this.identity = identity
@@ -123,16 +128,29 @@ export default {
       const account = this.identity.account
 
       // Load default token
-      const testToken = radixTokenManager.getTokenByISO('TEST')
+      const tokenId = radixTokenManager.nativeToken.toString() // Assume single token transactions
 
       // Get address
       this.address = account.getAddress()
-      // Get balance
-      account.transferSystem.balanceSubject.subscribe(balance => {
-        this.balance = testToken.toTokenUnits(balance[testToken.id.toString()])
-      })
+
+      // Get balance/s
+      account.transferSystem.getTokenUnitsBalanceUpdates()
+          .subscribe((balances) => {
+              // const strigifiedBalance = {}
+              // for (const tokenId in balance) {
+              //     strigifiedBalance[tokenId] = balance[tokenId].toString()
+              // }
+              this.balance = balances[tokenId].toString()
+          })
 
       account.openNodeConnection()
+
+      // setTimeout(() => {
+      //   console.log('closeNodeConnection')
+      //   account.closeNodeConnection()
+      //     .then((response) => console.log(`Response ${response}`))
+      //     .catch((error) => console.log(`Error ${error}`))
+      // }, 10000)
     })
   }
 }

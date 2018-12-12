@@ -30,10 +30,10 @@ export default {
     }
   },
   created () {
-    this.messages = this.identity.account.messagingSystem.messages.values()
+    this.messages = []
     // Get application message updates
     this.identity.account.messagingSystem.getAllMessages().subscribe(messageUpdate => {
-      this.messages = this.identity.account.messagingSystem.messages.values()
+      this.messages.push(messageUpdate.message)
     })
   }
 }
