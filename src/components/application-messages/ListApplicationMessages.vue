@@ -32,7 +32,11 @@ export default {
     }
   },
   created () {
-    this.getApplicationMessages()
+    this.identity.account.connectionStatus.subscribe(value => {
+      if (value === 'CONNECTED') {
+        this.identity.account.isSynced().subscribe(value => this.getApplicationMessages())
+      }
+    })
   },
   methods: {
     getApplicationMessages () {

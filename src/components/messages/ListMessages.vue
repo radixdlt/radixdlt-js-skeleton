@@ -30,10 +30,16 @@ export default {
     }
   },
   created () {
-    this.messages = []
-    // Get application message updates
-    this.identity.account.messagingSystem.getAllMessages().subscribe(messageUpdate => {
-      this.messages.push(messageUpdate.message)
+    this.identity.account.connectionStatus.subscribe(value => {
+      if (value === 'CONNECTED') {
+        this.identity.account.isSynced().subscribe(value => {
+          this.messages = []
+          // Get application message updates
+          this.identity.account.messagingSystem.getAllMessages().subscribe(messageUpdate => {
+            this.messages.push(messageUpdate.message)
+          })
+        })
+      }
     })
   }
 }

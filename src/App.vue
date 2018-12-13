@@ -117,7 +117,7 @@ export default {
     }
   },
   created () {
-    RadixLogger.setLevel('debug')
+    RadixLogger.setLevel('info')
 
     // Bootstrap the universe
     radixUniverse.bootstrap(RadixUniverse.LOCAL)

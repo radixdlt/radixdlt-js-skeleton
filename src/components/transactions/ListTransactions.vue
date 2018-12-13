@@ -32,18 +32,20 @@ export default {
     }
   },
   created () {
-    // this.transactions = [this.identity.account.transferSystem.transactions.values()]
-    this.transactions = []
-    // Get application message updates
-    this.identity.account.transferSystem.getAllTransactions().subscribe(transferUpdate => {
-      this.transactions.push({
-        balance: transferUpdate.transaction.tokenUnitsBalance[radixTokenManager.nativeToken.toString()].toString().replace(/"/g, ''),
-        symbol: radixTokenManager.nativeToken.symbol,
-        participants: transferUpdate.transaction.participants,
-        timestamp: transferUpdate.transaction.timestamp,
-        message: transferUpdate.transaction.message
-      })
-      // this.transactions = this.identity.account.transferSystem.transactions.values()
+    this.identity.account.connectionStatus.subscribe(value => {
+      if (value === 'CONNECTED') {
+        this.transactions = []
+        // Get application message updates
+        this.identity.account.transferSystem.getAllTransactions().subscribe(transferUpdate => {
+          this.transactions.push({
+            balance: transferUpdate.transaction.tokenUnitsBalance[radixTokenManager.nativeToken.toString()].toString().replace(/"/g, ''),
+            symbol: radixTokenManager.nativeToken.symbol,
+            participants: transferUpdate.transaction.participants,
+            timestamp: transferUpdate.transaction.timestamp,
+            message: transferUpdate.transaction.message
+          })
+        })
+      }
     })
   }
 }
