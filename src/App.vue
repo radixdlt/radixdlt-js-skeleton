@@ -4,7 +4,14 @@
     div.site-wrapper-inner
       h1 radixdlt-js
       h4 skeleton example
-      a(href="#", @click="resetIdentity()") Generate new identity
+      div(v-if="!remote")
+        a(href="#", @click="resetSimpleIdentity()") Generate new identity
+        br
+        a(href="#", @click="switchToRemoteIdentity()") Switch to remote identity
+      a(href="#", @click="switchToSimpleIdentity()", v-if="remote") Switch to simple identity
+      p
+      a(href="#", @click="unsubscribe()", v-if="!unsubscribed") Unsubscribe
+      p(v-if="unsubscribed") You're unsubscribed from this account!
 
       div(v-if="!identity") Decrypting key
       div(v-if="identity")
@@ -85,10 +92,13 @@ export default {
       balance: 'balance',
       token: null,
       identity: null,
+      remote: false,
+      unsubscribed: false,
     }
   },
   methods: {
     loadIdentity() {
+      this.remote = this.$localStorage.get('remote')
       return new Promise(async (resolve, reject) => {
         // NOTE: This is insecure, normally you would ask the user for a password
         const password = 'SuperDuperSecure'
@@ -102,18 +112,40 @@ export default {
           })
           resolve(new RadixSimpleIdentity(keyPair))
         } else {
-          // Load identity from localstorage
-          const encryptedKey = JSON.parse(this.$localStorage.get('keystore'))
-          RadixKeyStore.decryptKey(encryptedKey, password).then(keyPair => {
-            resolve(new RadixSimpleIdentity(keyPair))
-          })
-          // resolve(await RadixRemoteIdentity.createNew('my dApp', 'my dApp description'))
+          if (this.remote) {
+            resolve(await RadixRemoteIdentity.createNew('my dApp', 'my dApp description'))
+          } else {
+            // Load identity from localstorage            
+            const encryptedKey = JSON.parse(this.$localStorage.get('keystore'))
+            RadixKeyStore.decryptKey(encryptedKey, password).then(keyPair => {
+              resolve(new RadixSimpleIdentity(keyPair))
+            })
+          }
         }
       })
     },
-    resetIdentity() {
+    resetSimpleIdentity() {
       this.$localStorage.remove('keystore')
       location.reload()
+    },
+    switchToSimpleIdentity() {
+      this.$localStorage.remove('remote')
+      location.reload()
+    },
+    switchToRemoteIdentity() {
+      this.$localStorage.set('remote', true)
+      location.reload()
+    },
+    unsubscribe() {
+      this.unsubscribed = true
+      setTimeout(() => {
+        console.log('closeNodeConnection')
+        this.identity.account.closeNodeConnection()
+          .then((response) => {
+            console.log(`Response ${response}`)
+          })
+          .catch((error) => console.log(`Error ${error}`))
+      }, 3000)
     }
   },
   created () {
@@ -136,21 +168,10 @@ export default {
       // Get balance/s
       account.transferSystem.getTokenUnitsBalanceUpdates()
           .subscribe((balances) => {
-              // const strigifiedBalance = {}
-              // for (const tokenId in balance) {
-              //     strigifiedBalance[tokenId] = balance[tokenId].toString()
-              // }
               this.balance = balances[tokenId].toString()
           })
 
       account.openNodeConnection()
-
-      // setTimeout(() => {
-      //   console.log('closeNodeConnection')
-      //   account.closeNodeConnection()
-      //     .then((response) => console.log(`Response ${response}`))
-      //     .catch((error) => console.log(`Error ${error}`))
-      // }, 10000)
     })
   }
 }

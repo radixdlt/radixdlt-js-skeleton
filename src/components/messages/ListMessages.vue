@@ -36,7 +36,7 @@ export default {
           this.messages = []
           // Get application message updates
           this.identity.account.messagingSystem.getAllMessages().subscribe(messageUpdate => {
-            this.messages.push(messageUpdate.message)
+            this.messages = this.identity.account.messagingSystem.messages.values()
           })
         })
       }
