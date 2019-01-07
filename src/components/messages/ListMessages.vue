@@ -30,17 +30,22 @@ export default {
     }
   },
   created () {
-    this.identity.account.connectionStatus.subscribe(value => {
-      if (value === 'CONNECTED') {
-        this.identity.account.isSynced().subscribe(value => {
-          this.messages = []
-          // Get application message updates
-          this.identity.account.messagingSystem.getAllMessages().subscribe(messageUpdate => {
-            this.messages = this.identity.account.messagingSystem.messages.values()
-          })
-        })
-      }
+    this.messages = []
+    // Get application message updates
+    this.identity.account.messagingSystem.getAllMessages().subscribe(messageUpdate => {
+      this.messages = this.identity.account.messagingSystem.messages.values()
     })
+    // this.identity.account.connectionStatus.subscribe(value => {
+    //   if (value === 'CONNECTED') {
+    //     this.identity.account.isSynced().subscribe(value => {
+    //       this.messages = []
+    //       // Get application message updates
+    //       this.identity.account.messagingSystem.getAllMessages().subscribe(messageUpdate => {
+    //         this.messages = this.identity.account.messagingSystem.messages.values()
+    //       })
+    //     })
+    //   }
+    // })
   }
 }
 </script>

@@ -10,7 +10,7 @@
           th(scope="col") Message
       tbody
         tr(v-for="t in transactions")
-          td {{ t.balance }} {{ t.symbol }}
+          td {{ t.balance }} TEST
           td(v-for="p in t.participants", :key="p") {{ p }}
           td {{ t.timestamp }}
           td {{ t.message }}
@@ -37,9 +37,11 @@ export default {
         this.transactions = []
         // Get application message updates
         this.identity.account.transferSystem.getAllTransactions().subscribe(transferUpdate => {
+          console.log(transferUpdate)
           this.transactions.push({
-            balance: transferUpdate.transaction.tokenUnitsBalance[radixTokenManager.nativeToken.toString()].toString().replace(/"/g, ''),
-            symbol: radixTokenManager.nativeToken.symbol,
+            // balance: transferUpdate.transaction.tokenUnitsBalance[radixTokenManager.nativeToken.toString()].toString().replace(/"/g, ''),
+            balance: transferUpdate.transaction.balance,
+            // symbol: radixTokenManager.nativeToken.symbol,
             participants: transferUpdate.transaction.participants,
             timestamp: transferUpdate.transaction.timestamp,
             message: transferUpdate.transaction.message

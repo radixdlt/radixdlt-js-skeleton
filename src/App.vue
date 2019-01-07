@@ -67,10 +67,11 @@ import {
   RadixIdentityManager,
   RadixSimpleIdentity,
   RadixRemoteIdentity,
-  RadixAddress,
+  // RadixAddress,
+  RadixKeyPair,
   RadixKeyStore,
   RadixLogger,
-RadixIdentity,
+  RadixIdentity,
 } from '../../radixdlt-js'
 
 export default {
@@ -99,13 +100,15 @@ export default {
   methods: {
     loadIdentity() {
       this.remote = this.$localStorage.get('remote')
+
       return new Promise(async (resolve, reject) => {
         // NOTE: This is insecure, normally you would ask the user for a password
         const password = 'SuperDuperSecure'
 
         if (!this.$localStorage.get('keystore')) {
           // Generate a new radom identity
-          const keyPair = RadixAddress.generateNew()
+          const keyPair = RadixKeyPair.generateNew()
+          // const keyPair = RadixAddress.generateNew()
           RadixKeyStore.encryptKey(keyPair, password).then((encryptedKey) => {
             this.$localStorage.set('keystore', JSON.stringify(encryptedKey))
             console.log('Encrypted private key stored in localstorage')
@@ -149,10 +152,10 @@ export default {
     }
   },
   created () {
-    RadixLogger.setLevel('info')
+    RadixLogger.setLevel('error')
 
     // Bootstrap the universe
-    radixUniverse.bootstrap(RadixUniverse.LOCAL)
+    radixUniverse.bootstrap(RadixUniverse.ALPHANET)
 
     this.loadIdentity().then(identity => {
       this.identity = identity
@@ -160,16 +163,20 @@ export default {
       const account = this.identity.account
 
       // Load default token
-      const tokenId = radixTokenManager.nativeToken.toString() // Assume single token transactions
+      const testToken = radixTokenManager.getTokenByISO('TEST')
+      // const tokenId = radixTokenManager.nativeToken.toString() // Assume single token transactions
 
       // Get address
       this.address = account.getAddress()
 
       // Get balance/s
-      account.transferSystem.getTokenUnitsBalanceUpdates()
-          .subscribe((balances) => {
-              this.balance = balances[tokenId].toString()
-          })
+      account.transferSystem.balanceSubject.subscribe(balance => {
+        this.balance = testToken.toTokenUnits(balance[testToken.id.toString()])
+      })
+      // account.transferSystem.getTokenUnitsBalanceUpdates()
+      //     .subscribe((balances) => {
+      //         this.balance = balances[tokenId].toString()
+      //     })
 
       account.openNodeConnection()
     })
