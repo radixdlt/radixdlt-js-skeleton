@@ -19,9 +19,7 @@
 
 <script>
 
-import {
-  radixTokenManager,
-} from '../../../../radixdlt-js'
+import { radixTokenManager } from 'radixdlt'
 
 export default {
   name: 'ListTransactions',

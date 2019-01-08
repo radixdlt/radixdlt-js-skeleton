@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { RadixAccount, RadixTransactionBuilder, radixTokenManager } from '../../../../radixdlt-js'
+import { RadixAccount, RadixTransactionBuilder, radixTokenManager } from 'radixdlt'
 
 export default {
   name: 'SendTransaction',

@@ -61,7 +61,7 @@ import {
   RadixSimpleIdentity,
   RadixKeyPair,
   RadixKeyStore,
-} from '../../radixdlt-js'
+} from 'radixdlt'
 
 export default {
   name: 'App',

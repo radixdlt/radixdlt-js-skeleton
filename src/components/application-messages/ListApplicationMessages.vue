@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { RadixAccount } from '../../../../radixdlt-js'
+import { RadixAccount } from 'radixdlt'
 
 export default {
   name: 'ListApplicationMessages',
